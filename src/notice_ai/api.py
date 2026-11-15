@@ -103,7 +103,8 @@ def _generate(system: str, user: str, *, max_tokens: int = 1024) -> tuple[str, s
             from google import genai
             from google.genai import types
 
-            response = genai.Client(api_key=api_key).models.generate_content(
+            client = genai.Client(api_key=api_key)
+            response = client.models.generate_content(
                 model=model,
                 contents=user,
                 config=types.GenerateContentConfig(
