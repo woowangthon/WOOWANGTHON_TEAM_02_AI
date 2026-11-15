@@ -1,6 +1,6 @@
 # WOOWANGTHON_TEAM_02_AI
 
-BE가 선별한 공지 근거를 받아 AI 답변·요약과 게시판 selector 제안을 생성하는 독립 FastAPI 서비스입니다. DB 접근, 사용자 계정 인증, 공지 권한 판정, 크롤링은 포함하지 않습니다. 사용자 인증과 학교별 공지 접근 검사는 BE가 담당합니다.
+BE가 선별한 공지 근거로 답변·요약을 만들고, 공지와 무관한 질문에는 Google Search 기반 웹 답변을 제공하는 독립 FastAPI 서비스입니다. 게시판 selector 제안도 지원합니다. DB 접근, 사용자 계정 인증, 공지 권한 판정, 크롤링은 포함하지 않습니다. 사용자 인증과 학교별 공지 접근 검사는 BE가 담당합니다.
 
 ## 로컬 실행
 
@@ -28,6 +28,7 @@ AI 작업용 API는 `X-AI-Service-Token` 내부 인증 헤더를 요구합니다
 ```json
 {
   "question": "장학금 신청 마감일이 언제야?",
+  "web_search": false,
   "evidence": [
     {
       "id": "notice-123",
@@ -41,7 +42,9 @@ AI 작업용 API는 `X-AI-Service-Token` 내부 인증 헤더를 요구합니다
 }
 ```
 
-응답에는 `answer`, 전달받은 `evidence_ids`, `provider`, `prompt_tokens`, `completion_tokens`가 포함됩니다.
+`web_search`를 `true`로 보내면 Google Search grounding으로 일반 웹 질문에 답하고, 응답의 `sources`에 제목과 URL을 반환합니다. BE는 공지 검색 결과가 없을 때만 이 옵션을 사용합니다. 일반 공지 답변은 전달된 공지 내용만 사용합니다. 응답에는 `answer`, `evidence_ids`, `sources`, `provider`, `prompt_tokens`, `completion_tokens`가 포함됩니다.
+
+웹 검색에는 Google Gemini의 Google Search grounding이 필요하며, Gemini 3 계열의 검색 grounding은 유료 등급 활성화가 필요할 수 있습니다. 무료 제공량 초과 시 요금이 발생할 수 있으므로 Google의 [최신 가격표](https://ai.google.dev/gemini-api/docs/pricing)를 확인하세요.
 
 - `POST /v1/summarize`: `{ "notice": { "id", "title", "content", "source", "posted_at", "url" } }`를 받아 생성형 요약을 반환합니다.
 - `POST /v1/suggest-parser`: `{ "html": "..." }`을 받아 공지 목록 selector 후보를 반환합니다. 실제 페이지 적용 가능성은 BE가 검증합니다.
