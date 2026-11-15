@@ -67,7 +67,7 @@ def _authorize(service_token: str | None) -> None:
 def _generate(system: str, user: str, *, max_tokens: int = 1024) -> tuple[str, str, int, int]:
     provider = os.getenv("LLM_PROVIDER", "google")
     api_key = os.getenv("LLM_API_KEY", "")
-    model = os.getenv("LLM_MODEL", "gemini-2.5-flash-lite")
+    model = os.getenv("LLM_MODEL", "gemini-3.5-flash-lite")
     if not api_key:
         raise HTTPException(status_code=503, detail="AI provider is not configured")
     try:
